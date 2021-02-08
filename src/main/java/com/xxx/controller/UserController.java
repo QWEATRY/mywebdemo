@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -24,11 +25,26 @@ public class UserController {
     }
 
     @RequestMapping("/login")
-    public String login(String username, String psw, HttpServletRequest request)
+    public ModelAndView login(String username, String psw, HttpServletRequest request)
     {
         request.getSession().setAttribute("username",username);
         request.getSession().setAttribute("psw",psw);
-        return "forward:/favorite/showAllFar";
+
+        ModelAndView mv=new ModelAndView();
+        String error="用户名或密码不正确";
+        User user=userService.selectUserByName(username);
+        String password=user.getUserPassword();
+        if(password.equals(psw)){
+            mv.setViewName("forward:/favorite/showAllFar");
+            Integer id=user.getUserId();
+            request.getSession().setAttribute("userId",id);
+        }
+        else{
+            System.out.println("mv.addObject(error,error);");
+            mv.addObject("error",error);
+            mv.setViewName("login");
+        }
+        return mv;
     }
 
     @RequestMapping("/toAddUser")
@@ -38,12 +54,23 @@ public class UserController {
     }
 
     @RequestMapping("/addUser")
-    public String addUser(User user,HttpServletRequest request)
+    public ModelAndView addUser(User user,HttpServletRequest request)
     {
-        userService.insertUser(user);
+        ModelAndView mv=new ModelAndView();
+
+        String name=user.getUserName();
+        User users=userService.selectUserByName(name);
+
+        if(users==null) userService.insertUser(user);
+        else{
+            mv.addObject("error","用户名重复");
+            mv.setViewName("addUser");
+            return mv;
+        }
         request.getSession().setAttribute("username",user.getUserName());
         request.getSession().setAttribute("psw",user.getUserPassword());
         request.getSession().setAttribute("userId",user.getUserId());
-        return "forward/favorite/showAllFar";
+        mv.setViewName("forward:/favorite/showAllFar");
+        return mv;
     }
 }

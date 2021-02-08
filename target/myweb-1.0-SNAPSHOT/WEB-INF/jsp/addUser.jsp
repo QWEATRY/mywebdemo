@@ -11,14 +11,16 @@
     <title>创建用户</title>
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/book/addBook" method="post">
+<form action="${pageContext.request.contextPath}/user/addUser" method="post">
+
+    <a>${error}</a>
     <div class="form-group">
         <label>用户名</label>
-        <input type="text" name="userName" class="form-control" placeholder="bookName" required>
+        <input type="text" name="userName" class="form-control" placeholder="username" required>
     </div>
     <div class="form-group">
         <label>密码</label>
-        <input type="password" name="userPassword" class="form-control" placeholder="bookCount" required>
+        <input type="password" name="userPassword" class="form-control" placeholder="password" required>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>
 </form>
